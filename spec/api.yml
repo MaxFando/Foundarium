@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title: Swagger - OpenAPI 3.0
+  version: 1.0.0
+servers:
+  - url: http://localhost/api
+tags:
+  - name: cars
+    description: Everything about Cars
+  - name: clients
+    description: Everything about Clients
+  - name: admin
+    description: Admin actions
+paths:
+  /clients:
+    get:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - clients
+      description: get all clients
+      responses:
+        '200':
+          description: get all clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+
+  /clients/store:
+    post:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - clients
+      summary: Create new Client
+      description: Create new Client
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: Mini Cooper
+
+  /clients/delete/{clientId}:
+    delete:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - clients
+      description: Delete client
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Client was deleted
+
+  /cars:
+    get:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - cars
+      description: get all cars
+      responses:
+        '200':
+          description: get all cars
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Car'
+  /cars/store:
+    post:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - cars
+      description: Create new Car
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mark:
+                  type: string
+                  example: BMW
+                price:
+                  type: number
+                  example: 500
+                client_id:
+                  type: integer
+                  example: 1
+              required:
+                - mark
+                - price
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: BMW
+                      price:
+                        type: integer
+                        example: 500
+                      client_id:
+                        type: integer
+                        example: 1
+                      client:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: test
+
+
+  /cars/rent:
+    patch:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - cars
+      description: Rent a Car
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mark:
+                  type: string
+                  example: BMW
+                client_id:
+                  type: integer
+                  example: 1
+              required:
+                - mark
+                - client_id
+      responses:
+        '200':
+          description: Rented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: string
+                        example: BMW
+                      price:
+                        type: integer
+                        example: 500
+                      client_id:
+                        type: integer
+                        example: 1
+                      client:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: test
+
+
+  /cars/delete/{carId}:
+    delete:
+      security:
+        - BasicAuth: [ ]
+      tags:
+        - cars
+      description: Delete Car
+      parameters:
+        - name: carId
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Car was deleted
+
+  /user/login:
+    get:
+      tags:
+        - admin
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: username
+          in: query
+          description: The user name for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/xml:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid username/password supplied
+components:
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Foundarium
+    Car:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        mark:
+          type: string
+          example: Mini Cooper
+        client_id:
+          type: integer
+          example: 1
+        price:
+          type: number
+          example: 500
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        name:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: '12345'
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+security:
+  - BasicAuth: [ ]
